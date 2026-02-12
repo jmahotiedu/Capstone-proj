@@ -1,0 +1,24 @@
+{
+  "experiment_name": "baseline_sorting_wrenches_v1",
+  "dataset": {
+    "name": "replace-with-dataset-name",
+    "version": "replace-with-version",
+    "train_split": "train",
+    "val_split": "validation"
+  },
+  "model": {
+    "family": "pi0_or_groot",
+    "checkpoint": "replace-with-checkpoint-or-null"
+  },
+  "training": {
+    "seed": 42,
+    "epochs": 10,
+    "batch_size": 32,
+    "learning_rate": 0.0001
+  },
+  "evaluation": {
+    "task_success_metric": "success_rate",
+    "log_failure_reasons": true
+  }
+}
+
