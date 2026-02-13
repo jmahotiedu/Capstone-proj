@@ -13,6 +13,7 @@ from tkinter import filedialog, messagebox, ttk
 
 from .feature_hub import FeatureHubWindow
 from .utils import (
+    ARM_MODE_OPTIONS,
     RIGHT_MODE_OPTIONS,
     TRAJECTORY_OPTIONS,
     build_simulation_command,
@@ -46,6 +47,7 @@ class CapstoneControlCenter(tk.Tk):
         self.joint_a_var = tk.StringVar(value="0")
         self.joint_b_var = tk.StringVar(value="1")
         self.right_mode_var = tk.StringVar(value="same")
+        self.arm_mode_var = tk.StringVar(value="both")
         self.phase_offset_var = tk.StringVar(value="0.0")
         self.python_var = tk.StringVar(value=resolve_python_executable(self.root_dir))
         self.status_var = tk.StringVar(value="Idle")
@@ -197,14 +199,23 @@ class CapstoneControlCenter(tk.Tk):
             width=10,
         )
         right_mode_box.grid(row=0, column=5, padx=(6, 0))
-        joint_frame.columnconfigure(6, weight=1)
+        ttk.Label(joint_frame, text="Arm Mode").grid(row=0, column=6, sticky=tk.W, padx=(12, 0))
+        arm_mode_box = ttk.Combobox(
+            joint_frame,
+            textvariable=self.arm_mode_var,
+            values=ARM_MODE_OPTIONS,
+            state="readonly",
+            width=8,
+        )
+        arm_mode_box.grid(row=0, column=7, padx=(6, 0))
+        joint_frame.columnconfigure(8, weight=1)
 
         ttk.Label(sim_frame, text="Right Phase Offset (rad)").grid(row=15, column=0, sticky=tk.W, pady=(8, 0))
         ttk.Entry(sim_frame, textvariable=self.phase_offset_var).grid(row=16, column=0, sticky=tk.EW)
 
         ttk.Label(
             sim_frame,
-            text="Geometry uses joint A/B as X/Y in joint space (circle, half-circle, ellipse, figure8, line).",
+            text="Geometry uses joint A/B as X/Y in joint space; Arm Mode selects left/right/both control.",
             wraplength=430,
         ).grid(row=17, column=0, sticky=tk.W, pady=(6, 0))
 
@@ -338,6 +349,7 @@ class CapstoneControlCenter(tk.Tk):
             "joint_a": int(self.joint_a_var.get()),
             "joint_b": int(self.joint_b_var.get()),
             "right_mode": self.right_mode_var.get().strip(),
+            "arm_mode": self.arm_mode_var.get().strip(),
             "phase_offset": float(self.phase_offset_var.get()),
         }
 
@@ -367,6 +379,8 @@ class CapstoneControlCenter(tk.Tk):
             self.joint_b_var.set(str(settings["joint_b"]))
         if "right_mode" in settings:
             self.right_mode_var.set(str(settings["right_mode"]))
+        if "arm_mode" in settings:
+            self.arm_mode_var.set(str(settings["arm_mode"]))
         if "phase_offset" in settings:
             self.phase_offset_var.set(str(settings["phase_offset"]))
 
@@ -377,6 +391,8 @@ class CapstoneControlCenter(tk.Tk):
             raise ValueError(f"Unsupported trajectory: {settings['trajectory']}")
         if settings["right_mode"] not in RIGHT_MODE_OPTIONS:
             raise ValueError(f"Unsupported right mode: {settings['right_mode']}")
+        if settings["arm_mode"] not in ARM_MODE_OPTIONS:
+            raise ValueError(f"Unsupported arm mode: {settings['arm_mode']}")
         if settings["frequency"] < 0:
             raise ValueError("Frequency must be >= 0.")
         if settings["amp_a"] < 0 or settings["amp_b"] < 0:
@@ -415,6 +431,7 @@ class CapstoneControlCenter(tk.Tk):
             joint_a=settings["joint_a"],
             joint_b=settings["joint_b"],
             right_mode=settings["right_mode"],
+            arm_mode=settings["arm_mode"],
             phase_offset=settings["phase_offset"],
         )
         self._run_command(

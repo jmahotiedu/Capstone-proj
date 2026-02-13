@@ -11,6 +11,7 @@ from typing import Any
 
 TRAJECTORY_OPTIONS = ("static", "circle", "half_circle", "ellipse", "figure8", "line")
 RIGHT_MODE_OPTIONS = ("same", "mirror")
+ARM_MODE_OPTIONS = ("both", "left", "right")
 TASK_TEMPLATES: dict[str, dict[str, Any]] = {
     "Circle Joint Sweep": {
         "trajectory": "circle",
@@ -20,6 +21,7 @@ TASK_TEMPLATES: dict[str, dict[str, Any]] = {
         "joint_a": 0,
         "joint_b": 1,
         "right_mode": "mirror",
+        "arm_mode": "both",
         "phase_offset": 0.0,
         "joint_offset": 0.0,
     },
@@ -31,6 +33,7 @@ TASK_TEMPLATES: dict[str, dict[str, Any]] = {
         "joint_a": 0,
         "joint_b": 2,
         "right_mode": "same",
+        "arm_mode": "both",
         "phase_offset": 0.0,
         "joint_offset": 0.05,
     },
@@ -42,6 +45,7 @@ TASK_TEMPLATES: dict[str, dict[str, Any]] = {
         "joint_a": 0,
         "joint_b": 1,
         "right_mode": "mirror",
+        "arm_mode": "both",
         "phase_offset": 0.0,
         "joint_offset": 0.0,
     },
@@ -53,6 +57,7 @@ TASK_TEMPLATES: dict[str, dict[str, Any]] = {
         "joint_a": 1,
         "joint_b": 2,
         "right_mode": "same",
+        "arm_mode": "both",
         "phase_offset": 1.57,
         "joint_offset": 0.0,
     },
@@ -64,6 +69,7 @@ TASK_TEMPLATES: dict[str, dict[str, Any]] = {
         "joint_a": 3,
         "joint_b": 4,
         "right_mode": "same",
+        "arm_mode": "both",
         "phase_offset": 0.0,
         "joint_offset": 0.0,
     },
@@ -111,6 +117,7 @@ def build_simulation_command(
     joint_a: int,
     joint_b: int,
     right_mode: str,
+    arm_mode: str,
     phase_offset: float,
 ) -> list[str]:
     return [
@@ -136,6 +143,8 @@ def build_simulation_command(
         str(joint_b),
         "--right-mode",
         right_mode,
+        "--arm-mode",
+        arm_mode,
         "--phase-offset",
         str(phase_offset),
     ]

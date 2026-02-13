@@ -25,6 +25,7 @@ class GuiUtilsTest(unittest.TestCase):
             joint_a=0,
             joint_b=1,
             right_mode="mirror",
+            arm_mode="left",
             phase_offset=1.57,
         )
 
@@ -53,6 +54,8 @@ class GuiUtilsTest(unittest.TestCase):
                 "1",
                 "--right-mode",
                 "mirror",
+                "--arm-mode",
+                "left",
                 "--phase-offset",
                 "1.57",
             ],

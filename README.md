@@ -135,7 +135,7 @@ Useful options:
 Example geometric trajectory (ellipse):
 
 ```powershell
-.\.venv\Scripts\python.exe startup.py --model aloha.xml --sim-seconds 60 --trajectory ellipse --amp-a 0.35 --amp-b 0.15 --frequency 0.25 --joint-a 0 --joint-b 1 --right-mode mirror --phase-offset 0.0
+.\.venv\Scripts\python.exe startup.py --model aloha.xml --sim-seconds 60 --trajectory ellipse --amp-a 0.35 --amp-b 0.15 --frequency 0.25 --joint-a 0 --joint-b 1 --right-mode mirror --arm-mode both --phase-offset 0.0
 ```
 
 ### Run desktop control GUI (no terminal workflow needed)
@@ -150,6 +150,7 @@ What this GUI provides:
 - run tests with one click
 - run simulation with editable model/time/offset inputs
 - choose motion geometry for fast trajectory prototyping (`static`, `circle`, `half_circle`, `ellipse`, `figure8`, `line`)
+- choose which arm to control: `left`, `right`, or `both`
 - view git status
 - open key docs/config/XML files directly (double-click, Enter, or Ctrl+click)
 - view command logs in one place
@@ -376,6 +377,7 @@ Parameters:
 - `amp-a`, `amp-b`: trajectory amplitude(s) in radians
 - `frequency`: frequency in Hz
 - `right-mode`: `same` or `mirror`
+- `arm-mode`: `left`, `right`, or `both`
 - `phase-offset`: right-arm phase offset in radians
 ## 13. Common Errors and Fixes
 

@@ -16,6 +16,7 @@ from capstone_proj.control import JointSpacePDController
 
 TRAJECTORY_CHOICES = ("static", "circle", "half_circle", "ellipse", "figure8", "line")
 RIGHT_MODE_CHOICES = ("same", "mirror")
+ARM_MODE_CHOICES = ("both", "left", "right")
 
 
 def _shape_components(
@@ -110,6 +111,7 @@ def run_simulation(
     joint_a: int,
     joint_b: int,
     right_mode: str,
+    arm_mode: str,
     phase_offset_rad: float,
 ) -> None:
     model = mujoco.MjModel.from_xml_path(str(model_path))
@@ -141,6 +143,10 @@ def run_simulation(
                 phase_offset_rad=phase_offset_rad,
             )
             tau = controller.compute(data, q_des_left, q_des_right)
+            if arm_mode == "left":
+                tau[controller.right_actuator_ids] = 0.0
+            elif arm_mode == "right":
+                tau[controller.left_actuator_ids] = 0.0
             data.ctrl[:] = tau
             mujoco.mj_step(model, data)
             viewer.sync()
@@ -169,6 +175,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         choices=RIGHT_MODE_CHOICES,
         help="Right arm behavior relative to left trajectory.",
     )
+    parser.add_argument(
+        "--arm-mode",
+        default="both",
+        choices=ARM_MODE_CHOICES,
+        help="Control left arm only, right arm only, or both.",
+    )
     parser.add_argument("--phase-offset", type=float, default=0.0, help="Right-arm phase offset in radians.")
     return parser.parse_args(argv)
 
@@ -188,6 +200,8 @@ def main(argv: list[str] | None = None) -> int:
         raise ValueError("--amp-a and --amp-b must be >= 0")
     if not 0 <= args.joint_a <= 6 or not 0 <= args.joint_b <= 6:
         raise ValueError("--joint-a and --joint-b must be in [0, 6]")
+    if args.arm_mode not in ARM_MODE_CHOICES:
+        raise ValueError(f"--arm-mode must be one of {ARM_MODE_CHOICES}")
 
     run_simulation(
         model_path=model_path,
@@ -200,6 +214,7 @@ def main(argv: list[str] | None = None) -> int:
         joint_a=args.joint_a,
         joint_b=args.joint_b,
         right_mode=args.right_mode,
+        arm_mode=args.arm_mode,
         phase_offset_rad=args.phase_offset,
     )
     return 0
