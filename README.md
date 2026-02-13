@@ -132,6 +132,21 @@ Useful options:
 .\.venv\Scripts\python.exe startup.py --model aloha.xml --sim-seconds 120 --joint-offset 0.2
 ```
 
+### Run desktop control GUI (no terminal workflow needed)
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_control_center.py
+```
+
+What this GUI provides:
+
+- create `.venv` and install dependencies
+- run tests with one click
+- run simulation with editable model/time/offset inputs
+- view git status
+- open key docs/config/XML files directly
+- view command logs in one place
+
 ## 6. VS Code Configuration (Recommended)
 
 Open Command Palette: `Ctrl+Shift+P`.
@@ -190,6 +205,9 @@ If mesh files are missing or renamed, MuJoCo throws "Error opening file ..." dur
 - `capstone_proj/simulation/run_pid.py`: simulation CLI (`--model`, `--sim-seconds`, `--joint-offset`).
 - `startup.py`: compatibility entrypoint that calls the new simulation CLI.
 - `PID_Control.py`: compatibility import surface for older code.
+- `capstone_proj/gui/control_center.py`: desktop control center UI for running common actions.
+- `capstone_proj/gui/utils.py`: helper logic used by the GUI.
+- `scripts/run_control_center.py`: launcher for the GUI app.
 - `tests/`: unit tests for controller logic and input validation.
 - `configs/`: experiment config templates.
 - `docs/research/`: reading list and LeRobot/Hugging Face kickoff.
