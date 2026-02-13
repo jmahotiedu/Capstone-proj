@@ -136,15 +136,27 @@ class CapstoneControlCenter(tk.Tk):
         resources_frame = ttk.LabelFrame(parent, text="Open Key Files", padding=10)
         resources_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.resource_list = tk.Listbox(resources_frame, height=12)
+        self.resource_list = tk.Listbox(
+            resources_frame,
+            height=12,
+            selectmode=tk.BROWSE,
+            exportselection=False,
+        )
         for path in self._resource_paths:
             self.resource_list.insert(tk.END, path)
         self.resource_list.pack(fill=tk.BOTH, expand=True)
         self.resource_list.selection_set(0)
+        self.resource_list.bind("<<ListboxSelect>>", self._on_resource_selected)
+        self.resource_list.bind("<Double-Button-1>", self._open_selected_resource_event)
+        self.resource_list.bind("<Return>", self._open_selected_resource_event)
+        self.resource_list.bind("<Control-Button-1>", self._open_resource_ctrl_click)
 
         open_file_btn = ttk.Button(resources_frame, text="Open Selected File", command=self._open_selected_resource)
         open_file_btn.pack(anchor=tk.W, pady=(8, 0))
         self._command_buttons.append(open_file_btn)
+        ttk.Label(resources_frame, text="Tip: double-click, Enter, or Ctrl+click a file to open it.").pack(
+            anchor=tk.W, pady=(4, 0)
+        )
 
     def _build_log_panel(self, parent: ttk.Frame) -> None:
         status_frame = ttk.Frame(parent)
@@ -237,8 +249,27 @@ class CapstoneControlCenter(tk.Tk):
     def _open_repo_folder(self) -> None:
         self._open_path(self.root_dir)
 
+    def _on_resource_selected(self, _event: tk.Event | None = None) -> None:
+        if not self.resource_list.curselection():
+            return
+        selection_index = self.resource_list.curselection()[0]
+        relative_path = self.resource_list.get(selection_index)
+        self.status_var.set(f"Selected: {relative_path} (double-click, Enter, or Ctrl+click to open)")
+
+    def _open_selected_resource_event(self, _event: tk.Event | None = None) -> None:
+        self._open_selected_resource()
+
+    def _open_resource_ctrl_click(self, event: tk.Event) -> str:
+        index = self.resource_list.nearest(event.y)
+        self.resource_list.selection_clear(0, tk.END)
+        self.resource_list.selection_set(index)
+        self.resource_list.activate(index)
+        self._open_selected_resource()
+        return "break"
+
     def _open_selected_resource(self) -> None:
         if not self.resource_list.curselection():
+            messagebox.showinfo("Open File", "Select a file from the list first.")
             return
         selection_index = self.resource_list.curselection()[0]
         relative_path = self.resource_list.get(selection_index)
@@ -250,6 +281,8 @@ class CapstoneControlCenter(tk.Tk):
             return
         try:
             os.startfile(str(path))  # type: ignore[attr-defined]
+            self._append_output(f"[Control Center] Opened: {path}")
+            self.status_var.set(f"Opened: {path.name}")
         except Exception as exc:
             messagebox.showerror("Open Failed", f"Could not open path:\n{path}\n\n{exc}")
 
@@ -350,4 +383,3 @@ class CapstoneControlCenter(tk.Tk):
 def launch() -> None:
     app = CapstoneControlCenter()
     app.mainloop()
-

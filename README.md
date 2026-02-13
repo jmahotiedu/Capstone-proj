@@ -144,7 +144,7 @@ What this GUI provides:
 - run tests with one click
 - run simulation with editable model/time/offset inputs
 - view git status
-- open key docs/config/XML files directly
+- open key docs/config/XML files directly (double-click, Enter, or Ctrl+click)
 - view command logs in one place
 
 ## 6. VS Code Configuration (Recommended)
