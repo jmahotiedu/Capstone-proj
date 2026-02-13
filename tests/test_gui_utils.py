@@ -2,7 +2,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from capstone_proj.gui.utils import build_simulation_command, resolve_python_executable
+from capstone_proj.gui.utils import (
+    build_simulation_command,
+    human_size,
+    parse_number_list,
+    resolve_python_executable,
+    trajectory_samples,
+)
 
 
 class GuiUtilsTest(unittest.TestCase):
@@ -67,6 +73,27 @@ class GuiUtilsTest(unittest.TestCase):
             root = Path(tmp)
             resolved = resolve_python_executable(root=root, fallback="fallback-python")
             self.assertEqual(resolved, "fallback-python")
+
+    def test_parse_number_list(self):
+        values = parse_number_list("0.1, 0.2,1.0")
+        self.assertEqual(values, [0.1, 0.2, 1.0])
+
+    def test_trajectory_samples_returns_requested_points(self):
+        times, xs, ys = trajectory_samples(
+            trajectory="ellipse",
+            amp_a=0.3,
+            amp_b=0.2,
+            frequency=0.2,
+            duration_sec=5.0,
+            points=120,
+        )
+        self.assertEqual(len(times), 120)
+        self.assertEqual(len(xs), 120)
+        self.assertEqual(len(ys), 120)
+
+    def test_human_size(self):
+        self.assertEqual(human_size(512), "512.0 B")
+        self.assertEqual(human_size(2048), "2.0 KB")
 
 
 if __name__ == "__main__":

@@ -154,6 +154,28 @@ What this GUI provides:
 - open key docs/config/XML files directly (double-click, Enter, or Ctrl+click)
 - view command logs in one place
 
+Open the advanced feature window from the main GUI with `Open Feature Hub`.
+The hub includes:
+
+- trajectory presets library
+- trajectory plot preview
+- live joint scope
+- run recording and replay
+- experiment launcher from `configs/*.json`
+- run comparison
+- failure tagging
+- auto run reports
+- safety limits
+- batch sweep mode
+- one-click environment doctor
+- dataset browser
+- LeRobot-style dataset validator
+- training job starter
+- inference demo launcher
+- PR helper draft generator
+- task templates
+- session timeline
+
 ## 6. VS Code Configuration (Recommended)
 
 Open Command Palette: `Ctrl+Shift+P`.
@@ -213,6 +235,7 @@ If mesh files are missing or renamed, MuJoCo throws "Error opening file ..." dur
 - `startup.py`: compatibility entrypoint that calls the new simulation CLI.
 - `PID_Control.py`: compatibility import surface for older code.
 - `capstone_proj/gui/control_center.py`: desktop control center UI for running common actions.
+- `capstone_proj/gui/feature_hub.py`: advanced tabs for presets, sweeps, dataset validation, PR helper, and timeline.
 - `capstone_proj/gui/utils.py`: helper logic used by the GUI.
 - `scripts/run_control_center.py`: launcher for the GUI app.
 - `tests/`: unit tests for controller logic and input validation.
