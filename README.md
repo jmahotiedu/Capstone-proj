@@ -132,6 +132,12 @@ Useful options:
 .\.venv\Scripts\python.exe startup.py --model aloha.xml --sim-seconds 120 --joint-offset 0.2
 ```
 
+Example geometric trajectory (ellipse):
+
+```powershell
+.\.venv\Scripts\python.exe startup.py --model aloha.xml --sim-seconds 60 --trajectory ellipse --amp-a 0.35 --amp-b 0.15 --frequency 0.25 --joint-a 0 --joint-b 1 --right-mode mirror --phase-offset 0.0
+```
+
 ### Run desktop control GUI (no terminal workflow needed)
 
 ```powershell
@@ -143,6 +149,7 @@ What this GUI provides:
 - create `.venv` and install dependencies
 - run tests with one click
 - run simulation with editable model/time/offset inputs
+- choose motion geometry for fast trajectory prototyping (`static`, `circle`, `half_circle`, `ellipse`, `figure8`, `line`)
 - view git status
 - open key docs/config/XML files directly (double-click, Enter, or Ctrl+click)
 - view command logs in one place
@@ -322,7 +329,32 @@ Use this structure in every PR description:
 - baseline experiment run with Pi0-style or GROOT-style approach.
 - robust task success/failure labeling ("tell robot no" loop).
 
-## 12. Common Errors and Fixes
+## 12. Geometry Trajectory Feature (Why It Helps)
+
+The GUI/CLI geometry controls are useful for early research and systems testing because they let the team quickly:
+
+- stress-test coordinated bimanual motions before policy training
+- validate joint sign/mirroring assumptions
+- generate repeatable motion patterns for baseline comparisons
+- probe controller stability under different rhythmic and nontrivial trajectories
+
+Available profiles:
+
+- `static`: fixed offset on one joint
+- `circle`: circular oscillation in selected joint plane
+- `half_circle`: upper arc sweep in selected joint plane
+- `ellipse`: elliptical oscillation in selected joint plane
+- `figure8`: figure-8/Lissajous-style motion
+- `line`: 1D oscillation on joint-a
+
+Parameters:
+
+- `joint-a`, `joint-b`: which joint indices (0-6) form the motion plane
+- `amp-a`, `amp-b`: trajectory amplitude(s) in radians
+- `frequency`: frequency in Hz
+- `right-mode`: `same` or `mirror`
+- `phase-offset`: right-arm phase offset in radians
+## 13. Common Errors and Fixes
 
 ### `python : The term 'python' is not recognized`
 
@@ -352,7 +384,7 @@ Check these files exist:
 - Ensure you are running locally with graphics support.
 - Remote/headless sessions may not support interactive OpenGL viewer.
 
-## 13. Team Rules (Practical)
+## 14. Team Rules (Practical)
 
 1. Never push directly to `main` unless explicitly approved.
 2. Every code change should include a test or a reason why test is not possible.
@@ -360,7 +392,7 @@ Check these files exist:
 4. Keep experiment configs versioned and reproducible.
 5. Keep large data and generated artifacts out of Git.
 
-## 14. Useful Commands Cheat Sheet
+## 15. Useful Commands Cheat Sheet
 
 ```powershell
 # activate environment

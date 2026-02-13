@@ -30,7 +30,18 @@ def resolve_python_executable(root: Path | None = None, fallback: str | None = N
 
 
 def build_simulation_command(
-    python_executable: str, model: str, sim_seconds: float, joint_offset: float
+    python_executable: str,
+    model: str,
+    sim_seconds: float,
+    joint_offset: float,
+    trajectory: str,
+    amp_a: float,
+    amp_b: float,
+    frequency: float,
+    joint_a: int,
+    joint_b: int,
+    right_mode: str,
+    phase_offset: float,
 ) -> list[str]:
     return [
         python_executable,
@@ -41,5 +52,20 @@ def build_simulation_command(
         str(sim_seconds),
         "--joint-offset",
         str(joint_offset),
+        "--trajectory",
+        trajectory,
+        "--amp-a",
+        str(amp_a),
+        "--amp-b",
+        str(amp_b),
+        "--frequency",
+        str(frequency),
+        "--joint-a",
+        str(joint_a),
+        "--joint-b",
+        str(joint_b),
+        "--right-mode",
+        right_mode,
+        "--phase-offset",
+        str(phase_offset),
     ]
-

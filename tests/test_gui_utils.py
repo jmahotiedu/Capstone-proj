@@ -12,6 +12,14 @@ class GuiUtilsTest(unittest.TestCase):
             model="aloha.xml",
             sim_seconds=30.0,
             joint_offset=0.25,
+            trajectory="ellipse",
+            amp_a=0.30,
+            amp_b=0.20,
+            frequency=0.50,
+            joint_a=0,
+            joint_b=1,
+            right_mode="mirror",
+            phase_offset=1.57,
         )
 
         self.assertEqual(
@@ -25,6 +33,22 @@ class GuiUtilsTest(unittest.TestCase):
                 "30.0",
                 "--joint-offset",
                 "0.25",
+                "--trajectory",
+                "ellipse",
+                "--amp-a",
+                "0.3",
+                "--amp-b",
+                "0.2",
+                "--frequency",
+                "0.5",
+                "--joint-a",
+                "0",
+                "--joint-b",
+                "1",
+                "--right-mode",
+                "mirror",
+                "--phase-offset",
+                "1.57",
             ],
         )
 
@@ -47,4 +71,3 @@ class GuiUtilsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

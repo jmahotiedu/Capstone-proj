@@ -12,6 +12,9 @@ from tkinter import filedialog, messagebox, ttk
 
 from .utils import build_simulation_command, project_root, resolve_python_executable
 
+TRAJECTORY_OPTIONS = ("static", "circle", "half_circle", "ellipse", "figure8", "line")
+RIGHT_MODE_OPTIONS = ("same", "mirror")
+
 
 class CapstoneControlCenter(tk.Tk):
     def __init__(self) -> None:
@@ -29,6 +32,14 @@ class CapstoneControlCenter(tk.Tk):
         self.model_var = tk.StringVar(value="aloha.xml")
         self.sim_seconds_var = tk.StringVar(value="60")
         self.joint_offset_var = tk.StringVar(value="0.3")
+        self.trajectory_var = tk.StringVar(value="static")
+        self.amp_a_var = tk.StringVar(value="0.30")
+        self.amp_b_var = tk.StringVar(value="0.20")
+        self.frequency_var = tk.StringVar(value="0.20")
+        self.joint_a_var = tk.StringVar(value="0")
+        self.joint_b_var = tk.StringVar(value="1")
+        self.right_mode_var = tk.StringVar(value="same")
+        self.phase_offset_var = tk.StringVar(value="0.0")
         self.python_var = tk.StringVar(value=resolve_python_executable(self.root_dir))
         self.status_var = tk.StringVar(value="Idle")
 
@@ -109,11 +120,54 @@ class CapstoneControlCenter(tk.Tk):
         ttk.Label(sim_frame, text="Simulation Seconds").grid(row=2, column=0, sticky=tk.W, pady=(8, 0))
         ttk.Entry(sim_frame, textvariable=self.sim_seconds_var).grid(row=3, column=0, sticky=tk.EW)
 
-        ttk.Label(sim_frame, text="Joint Offset").grid(row=4, column=0, sticky=tk.W, pady=(8, 0))
+        ttk.Label(sim_frame, text="Base Joint Offset (rad)").grid(row=4, column=0, sticky=tk.W, pady=(8, 0))
         ttk.Entry(sim_frame, textvariable=self.joint_offset_var).grid(row=5, column=0, sticky=tk.EW)
 
+        ttk.Label(sim_frame, text="Trajectory").grid(row=6, column=0, sticky=tk.W, pady=(8, 0))
+        trajectory_box = ttk.Combobox(
+            sim_frame,
+            textvariable=self.trajectory_var,
+            values=TRAJECTORY_OPTIONS,
+            state="readonly",
+        )
+        trajectory_box.grid(row=7, column=0, sticky=tk.EW)
+
+        ttk.Label(sim_frame, text="Amplitude A (rad)").grid(row=8, column=0, sticky=tk.W, pady=(8, 0))
+        ttk.Entry(sim_frame, textvariable=self.amp_a_var).grid(row=9, column=0, sticky=tk.EW)
+        ttk.Label(sim_frame, text="Amplitude B (rad)").grid(row=10, column=0, sticky=tk.W, pady=(8, 0))
+        ttk.Entry(sim_frame, textvariable=self.amp_b_var).grid(row=11, column=0, sticky=tk.EW)
+
+        ttk.Label(sim_frame, text="Frequency (Hz)").grid(row=12, column=0, sticky=tk.W, pady=(8, 0))
+        ttk.Entry(sim_frame, textvariable=self.frequency_var).grid(row=13, column=0, sticky=tk.EW)
+
+        joint_frame = ttk.Frame(sim_frame)
+        joint_frame.grid(row=14, column=0, sticky=tk.EW, pady=(8, 0))
+        ttk.Label(joint_frame, text="Joint A").grid(row=0, column=0, sticky=tk.W)
+        ttk.Entry(joint_frame, width=6, textvariable=self.joint_a_var).grid(row=0, column=1, padx=(6, 12))
+        ttk.Label(joint_frame, text="Joint B").grid(row=0, column=2, sticky=tk.W)
+        ttk.Entry(joint_frame, width=6, textvariable=self.joint_b_var).grid(row=0, column=3, padx=(6, 12))
+        ttk.Label(joint_frame, text="Right Mode").grid(row=0, column=4, sticky=tk.W)
+        right_mode_box = ttk.Combobox(
+            joint_frame,
+            textvariable=self.right_mode_var,
+            values=RIGHT_MODE_OPTIONS,
+            state="readonly",
+            width=10,
+        )
+        right_mode_box.grid(row=0, column=5, padx=(6, 0))
+        joint_frame.columnconfigure(6, weight=1)
+
+        ttk.Label(sim_frame, text="Right Phase Offset (rad)").grid(row=15, column=0, sticky=tk.W, pady=(8, 0))
+        ttk.Entry(sim_frame, textvariable=self.phase_offset_var).grid(row=16, column=0, sticky=tk.EW)
+
+        ttk.Label(
+            sim_frame,
+            text="Geometry uses joint A/B as X/Y in joint space (circle, half-circle, ellipse, figure8, line).",
+            wraplength=430,
+        ).grid(row=17, column=0, sticky=tk.W, pady=(6, 0))
+
         run_sim_btn = ttk.Button(sim_frame, text="Run Simulation", command=self._run_simulation)
-        run_sim_btn.grid(row=6, column=0, sticky=tk.W, pady=(10, 0))
+        run_sim_btn.grid(row=18, column=0, sticky=tk.W, pady=(10, 0))
         self._command_buttons.append(run_sim_btn)
         sim_frame.columnconfigure(0, weight=1)
 
@@ -232,10 +286,32 @@ class CapstoneControlCenter(tk.Tk):
         try:
             sim_seconds = float(self.sim_seconds_var.get())
             joint_offset = float(self.joint_offset_var.get())
+            amp_a = float(self.amp_a_var.get())
+            amp_b = float(self.amp_b_var.get())
+            frequency = float(self.frequency_var.get())
+            joint_a = int(self.joint_a_var.get())
+            joint_b = int(self.joint_b_var.get())
+            phase_offset = float(self.phase_offset_var.get())
             if sim_seconds <= 0:
                 raise ValueError("Simulation seconds must be > 0.")
+            if frequency < 0:
+                raise ValueError("Frequency must be >= 0.")
+            if amp_a < 0 or amp_b < 0:
+                raise ValueError("Amplitude values must be >= 0.")
+            if not 0 <= joint_a <= 6 or not 0 <= joint_b <= 6:
+                raise ValueError("Joint A and Joint B must be integers in [0, 6].")
         except ValueError as exc:
             messagebox.showerror("Invalid Simulation Input", str(exc))
+            return
+
+        trajectory = self.trajectory_var.get().strip()
+        if trajectory not in TRAJECTORY_OPTIONS:
+            messagebox.showerror("Invalid Trajectory", f"Unsupported trajectory: {trajectory}")
+            return
+
+        right_mode = self.right_mode_var.get().strip()
+        if right_mode not in RIGHT_MODE_OPTIONS:
+            messagebox.showerror("Invalid Right Mode", f"Unsupported right mode: {right_mode}")
             return
 
         command = build_simulation_command(
@@ -243,6 +319,14 @@ class CapstoneControlCenter(tk.Tk):
             model=self.model_var.get(),
             sim_seconds=sim_seconds,
             joint_offset=joint_offset,
+            trajectory=trajectory,
+            amp_a=amp_a,
+            amp_b=amp_b,
+            frequency=frequency,
+            joint_a=joint_a,
+            joint_b=joint_b,
+            right_mode=right_mode,
+            phase_offset=phase_offset,
         )
         self._run_command(command, description="Run simulation")
 
